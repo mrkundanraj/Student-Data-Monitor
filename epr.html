@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student data monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+</head>
+<body>
+    <div class="loading"></div>
+    <div class="container">
+        <div class="header">
+            <h1>Student Data Monitor</h1>
+        </div>
+
+        <div class="nav">
+            <button class="nav-button active" onclick="showSection('dashboard')">Dashboard</button>
+            <button class="nav-button" onclick="showSection('students')">Students</button>
+            <button class="nav-button" onclick="showSection('attṇendance')">Attendance</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <h2>Overview of<span>Khalsa College of Engineering and Technology</span>Student Dashboard</h2>
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Total Students</h3>
+                    <p id="total-students">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Attendance</h3>
+                    <p id="avg-attendance">0%</p>
+                </div>
+            </div>
+
+            <div class="dashboard-charts">
+                <div class="chart-container">
+                    <h4>Course Distribution</h4>
+                    <div id="courseDistributionChart"></div>
+                </div>
+                <div class="chart-container">
+                    <h4>Overall Attendance</h4>
+                    <div id="overallAttendanceChart"></div>
+                </div>
+                <div class="chart-container">
+                    <h4>Gender Distribution</h4>
+                    <div id="genderDistributionChart"></div>
+                </div>
+                <div class="chart-container">
+                    <h4>Monthly Attendance Trend</h4>
+                    <div id="attendanceTrendChart"></div>
+                </div>
+                <div class="chart-container">
+                    
+                    <div id="stateDistributionChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div id="students" class="content-section">
+            <h2>Student Records</h2>
+            <div class="button-group">
+                <button class="btn" onclick="showStudentForm()">Add New Student</button>
+            </div>
+            
+            <!-- Add this wrapper div -->
+            <div class="student-list-wrapper">
+                <table id="student-list">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Course</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Student data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Student Form -->
+            <div id="student-form" style="display: none; margin-top: 20px;">
+                <h3>Add New Student</h3>
+                <form id="studentForm" onsubmit="handleStudentSubmit(event)">
+                    <div class="form-group">
+                        <label>Full Name:</label>
+                        <input type="text" name="full-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID:</label>
+                        <input type="text" name="student-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Number:</label>
+                        <div class="contact-input-group">
+                            <span class="country-code">+91</span>
+                            <input type="tel" name="contact" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth:</label>
+                        <input type="date" name="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender:</label>
+                        <select name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Course:</label>
+                        <select name="course" required>
+                            <option value="">Select Course</option>
+                            <option>Computer Science</option>
+                            <option>Electrical Engineering</option>
+                            <option>Mechanical Engineering</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Address:</label>
+                        <textarea name="address" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <h4>Internal Marks</h4>
+                        <div class="marks-edit-grid">
+                            <div class="form-group">
+                                <label>Assignment 1 (25):</label>
+                                <input type="number" name="assignment1" min="0" max="25">
+                            </div>
+                            <div class="form-group">
+                                <label>Assignment 2 (25):</label>
+                                <input type="number" name="assignment2" min="0" max="25">
+                            </div>
+                            <div class="form-group">
+                                <label>Mid Sem 1 (25):</label>
+                                <input type="number" name="midsem1" min="0" max="25">
+                            </div>
+                            <div class="form-group">
+                                <label>Mid Sem 2 (25):</label>
+                                <input type="number" name="midsem2" min="0" max="25">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn">Save Student</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideStudentForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Add this after the student list table -->
+            <div id="student-profile" class="profile-section">
+                <h3>Student Profile</h3>
+                <div class="search-profile">
+                    <input type="text" id="profile-search" placeholder="Enter Student ID">
+                    <button class="btn" onclick="searchAndShowProfile()">Show Profile</button>
+                </div>
+                
+                <div class="profile-content" style="display: none;">
+                    <div class="profile-info">
+                        <div class="info-card">
+                            <h4>Basic Information</h4>
+                            <p><strong>Name:</strong> <span id="profile-name"></span></p>
+                            <p><strong>ID:</strong> <span id="profile-id"></span></p>
+                            <p><strong>Course:</strong> <span id="profile-course"></span></p>
+                            <p><strong>Gender:</strong> <span id="profile-gender"></span></p>
+                            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                            <p><strong>Contact:</strong> <span id="profile-contact"></span></p>
+                            <p><strong>Address:</strong> <span id="profile-address"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-charts">
+                        <div class="chart-box">
+                            <h4>Internal Assessment</h4>
+                            <div id="marksChart"></div>
+                        </div>
+                        <div class="chart-box">
+                            <h4>Attendance Overview</h4>
+                            <div id="attendanceChart"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-summary">
+                        <div class="summary-card">
+                            <h4>Performance Summary</h4>
+                            <p><strong>Total Marks:</strong> <span id="total-marks"></span>/100</p>
+                            <p><strong>Attendance Rate:</strong> <span id="attendance-rate"></span>%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div id="attendance" class="content-section">
+            <h2>Attendance Management</h2>
+            
+            <!-- Course Selection and Date -->
+            <div class="attendance-header">
+                <div class="form-group">
+                    <label>Select Course:</label>
+                    <select id="course-filter" onchange="loadAttendanceTable()">
+                        <option value="">All Courses</option>
+                        <option>Computer Science</option>
+                        <option>Electrical Engineering</option>
+                        <option>Mechanical Engineering</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="attendance-date" required>
+                </div>
+            </div>
+
+            <!-- Attendance Marking Table -->
+            <div class="attendance-table-container">
+                <table id="attendance-marking">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Student attendance rows will be inserted here -->
+                    </tbody>
+                </table>
+                <button class="btn" onclick="markAttendance()">Save Attendance</button>
+            </div>
+
+            <!-- Attendance Records -->
+            <div class="attendance-records">
+                <div class="records-header">
+                    <h3>Attendance Records</h3>
+                    <div class="header-buttons">
+                        <button class="btn btn-export" onclick="exportAttendance()">Export to Excel</button>
+                        <button class="btn btn-danger" onclick="clearAttendanceHistory()">Clear History</button>
+                    </div>
+                </div>
+                <div class="records-filter">
+                    <div class="form-group">
+                        <label>Filter by Course:</label>
+                        <select id="records-course-filter" onchange="loadAttendanceRecords()">
+                            <option value="">All Courses</option>
+                            <option>Computer Science</option>
+                            <option>Electrical Engineering</option>
+                            <option>Mechanical Engineering</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by Date:</label>
+                        <input type="date" id="records-date-filter" onchange="loadAttendanceRecords()">
+                    </div>
+                </div>
+                <table id="attendance-records">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Attendance records will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2025 Student Data Monitor. All rights reserved.</p>
+            <p class="creators">Created by <span>Kundan</span> & <span>Dhananjay</span></p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
